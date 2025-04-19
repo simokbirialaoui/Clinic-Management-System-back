@@ -1,0 +1,6 @@
+com\clinic\patientms\PatientMsApplication.class
+com\clinic\patientms\repositories\RepositoryPatient.class
+com\clinic\patientms\entities\Patient.class
+com\clinic\patientms\entities\Patient$PatientBuilder.class
+com\clinic\patientms\enums\Gender.class
+com\clinic\patientms\controllers\PatientController.class
