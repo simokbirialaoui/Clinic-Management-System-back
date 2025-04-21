@@ -1,5 +1,6 @@
 package com.clinic.patientms.controllers;
 import com.clinic.patientms.entities.Patient;
+import com.clinic.patientms.kafka.PatientProducer;
 import com.clinic.patientms.repositories.RepositoryPatient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/patients")
 public class PatientController {
-
+    @Autowired
+    private PatientProducer patientProducer;
     @Autowired
     private RepositoryPatient repositoryPatient;
 
@@ -27,10 +29,7 @@ public class PatientController {
     }
 
     // 🔹 POST: ajouter un nouveau patient
-    @PostMapping
-    public Patient createPatient(@RequestBody Patient patient) {
-        return repositoryPatient.save(patient);
-    }
+
 
     // 🔹 PUT: mettre à jour un patient
     @PutMapping("/{id}")
@@ -55,5 +54,19 @@ public class PatientController {
     @DeleteMapping("/{id}")
     public void deletePatient(@PathVariable Long id) {
         repositoryPatient.deleteById(id);
+    }
+
+
+
+
+    @PostMapping
+    public Patient createPatient(@RequestBody Patient patient) {
+        // Sauvegarde du patient dans la base de données
+        Patient savedPatient = repositoryPatient.save(patient);
+
+        // Envoi des données du patient au topic Kafka
+        patientProducer.sendPatientData(savedPatient);
+
+        return savedPatient;
     }
 }
