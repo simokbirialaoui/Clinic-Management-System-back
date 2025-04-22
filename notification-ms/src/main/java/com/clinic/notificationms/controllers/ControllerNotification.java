@@ -5,6 +5,7 @@ import com.clinic.notificationms.repositories.RepositoryNotification;
 import com.clinic.notificationms.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -80,6 +81,15 @@ public class ControllerNotification {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    public void sendNotification(String message) {
+        messagingTemplate.convertAndSend("/topic/notifications", message);
     }
 
 }

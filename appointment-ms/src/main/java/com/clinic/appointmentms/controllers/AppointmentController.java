@@ -2,6 +2,7 @@ package com.clinic.appointmentms.controllers;
 
 import com.clinic.appointmentms.entities.Appointment;
 import com.clinic.appointmentms.repository.AppointmentRepository;
+import com.clinic.appointmentms.services.KafkaProducerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +23,15 @@ public class AppointmentController {
     public Appointment getAppointmentById(@PathVariable Long id) {
         return appointmentRepository.findById(id).orElse(null);
     }
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
+
     @PostMapping
-    public Appointment createAppointment(@RequestBody Appointment appointment) {
-        return appointmentRepository.save(appointment);
+    public String createAppointment(@RequestBody Appointment appointment) {
+        // Ici tu peux ajouter la logique de persistance si besoin
+        String msg = "Nouveau RDV pour patient: " + appointment.getPatientId() + " le " + appointment.getAppointmentDateTime();
+        kafkaProducerService.sendMessage(msg);
+        return "Rendez-vous créé et notification envoyée.";
     }
     @PutMapping("/{id}")
     public Appointment updateAppointment(@PathVariable Long id, @RequestBody Appointment updatedAppointment) {
