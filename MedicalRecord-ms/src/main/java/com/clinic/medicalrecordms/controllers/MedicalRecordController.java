@@ -1,7 +1,10 @@
 package com.clinic.medicalrecordms.controllers;
 
+import com.clinic.medicalrecordms.dto.MedicalRecordRequestDTO;
+import com.clinic.medicalrecordms.dto.MedicalRecordResponseDTO;
 import com.clinic.medicalrecordms.entities.MedicalRecord;
 import com.clinic.medicalrecordms.repository.MedicalRecordRepository;
+import com.clinic.medicalrecordms.service.MedicalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,39 +15,31 @@ import java.util.List;
 public class MedicalRecordController {
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
+    @Autowired
+    private MedicalRecordService medicalRecordService;
 
     @GetMapping
-    public List<MedicalRecord> getAllMedicalRecords() {
-        return medicalRecordRepository.findAll();
+    public List<MedicalRecordResponseDTO> getAllMedicalRecords() {
+        return medicalRecordService.getAllMedicalRecords();
     }
 
     @GetMapping("/{id}")
-    public MedicalRecord getMedicalRecordById(@PathVariable Long id) {
-        return medicalRecordRepository.findById(id).orElse(null);
+    public MedicalRecordResponseDTO getMedicalRecordById(@PathVariable Long id) {
+        return medicalRecordService.getMedicalRecordById(id);
     }
 
     @PostMapping
-    public MedicalRecord createMedicalRecord(@RequestBody MedicalRecord medicalRecord) {
-        return medicalRecordRepository.save(medicalRecord);
+    public MedicalRecordResponseDTO createMedicalRecord(@RequestBody MedicalRecordRequestDTO medicalRecordRequestDTO) {
+        return medicalRecordService.createMedicalRecord(medicalRecordRequestDTO);
     }
     @PutMapping("/{id}")
-    public MedicalRecord updateMedicalRecord(@PathVariable Long id, @RequestBody MedicalRecord updatedMedicalRecord) {
-        return medicalRecordRepository.findById(id)
-                .map(medicalRecord -> {
-                    medicalRecord.setDate(updatedMedicalRecord.getDate());
-                    medicalRecord.setDiagnosis(updatedMedicalRecord.getDiagnosis());
-                    medicalRecord.setPrescription(updatedMedicalRecord.getPrescription());
-                    medicalRecord.setNotes(updatedMedicalRecord.getNotes());
-                    return medicalRecordRepository.save(medicalRecord);
-                })
-                .orElseGet(() -> {
-                    updatedMedicalRecord.setId(id);
-                    return medicalRecordRepository.save(updatedMedicalRecord);
-                });
+    public MedicalRecordResponseDTO updateMedicalRecord(@PathVariable Long id, @RequestBody MedicalRecordRequestDTO medicalRecordRequestDTO) {
+        return medicalRecordService.updateMedicalRecord(id, medicalRecordRequestDTO);
+
     }
     @DeleteMapping("/{id}")
     public void deleteMedicalRecord(@PathVariable Long id) {
-        medicalRecordRepository.deleteById(id);
+        medicalRecordService.deleteMedicalRecord(id);
     }
 
 }
