@@ -1,6 +1,8 @@
 package com.clinic.doctorms.controllers;
 
+import com.clinic.doctorms.dtos.DoctorDto;
 import com.clinic.doctorms.entities.Doctor;
+import com.clinic.doctorms.mappers.DoctorMapperImpl;
 import com.clinic.doctorms.repositories.RepositoryDoctor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,33 +18,39 @@ public class DoctorController {
     @Autowired
     private RepositoryDoctor repository;
 
+    @Autowired
+    private DoctorMapperImpl doctorMapper;
+
     @GetMapping
-    public List<Doctor> getAllDoctors() {
-        return repository.findAll();
+    public List<DoctorDto> getAllDoctors() {
+        List<Doctor> doctors = repository.findAll();
+        return doctorMapper.fromDoctorList(doctors);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Doctor> getDoctorById(@PathVariable Long id) {
+    public ResponseEntity<DoctorDto> getDoctorById(@PathVariable Long id) {
         Optional<Doctor> doctor = repository.findById(id);
-        return doctor.map(ResponseEntity::ok)
+        return doctor.map(d -> ResponseEntity.ok(doctorMapper.fromDoctor(d)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Doctor createDoctor(@RequestBody Doctor doctor) {
-        return repository.save(doctor);
+    public DoctorDto createDoctor(@RequestBody DoctorDto doctorDto) {
+        Doctor doctor = doctorMapper.fromDoctorDTO(doctorDto);
+        Doctor savedDoctor = repository.save(doctor);
+        return doctorMapper.fromDoctor(savedDoctor);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Doctor> updateDoctor(@PathVariable Long id, @RequestBody Doctor updatedDoctor) {
+    public ResponseEntity<DoctorDto> updateDoctor(@PathVariable Long id, @RequestBody DoctorDto updatedDoctorDto) {
         return repository.findById(id).map(doctor -> {
-            doctor.setFirstName(updatedDoctor.getFirstName());
-            doctor.setLastName(updatedDoctor.getLastName());
-            doctor.setEmail(updatedDoctor.getEmail());
-            doctor.setPhone(updatedDoctor.getPhone());
-            doctor.setSpecialization(updatedDoctor.getSpecialization());
-            repository.save(doctor);
-            return ResponseEntity.ok(doctor);
+            doctor.setFirstName(updatedDoctorDto.getFirstName());
+            doctor.setLastName(updatedDoctorDto.getLastName());
+            doctor.setEmail(updatedDoctorDto.getEmail());
+            doctor.setPhone(updatedDoctorDto.getPhone());
+            doctor.setSpecialization(updatedDoctorDto.getSpecialization());
+            Doctor updatedDoctor = repository.save(doctor);
+            return ResponseEntity.ok(doctorMapper.fromDoctor(updatedDoctor));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
