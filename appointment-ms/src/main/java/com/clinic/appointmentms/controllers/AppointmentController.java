@@ -1,8 +1,10 @@
 package com.clinic.appointmentms.controllers;
 
+import com.clinic.appointmentms.dto.AppointmentRequestDTO;
+import com.clinic.appointmentms.dto.AppointmentResponseDTO;
 import com.clinic.appointmentms.entities.Appointment;
 import com.clinic.appointmentms.repository.AppointmentRepository;
-import com.clinic.appointmentms.services.KafkaProducerService;
+import com.clinic.appointmentms.service.AppointmentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,43 +15,32 @@ import java.util.List;
 public class AppointmentController {
     @Autowired
     private AppointmentRepository appointmentRepository;
-
+    @Autowired
+    private AppointmentServiceImpl appointmentService;
 
     @GetMapping
-    public List<Appointment> getAllAppointments() {
-        return appointmentRepository.findAll();
+    public List<AppointmentResponseDTO> getAllAppointments() {
+        return appointmentService.getAllAppointments();
     }
-    @GetMapping("/{id}")
-    public Appointment getAppointmentById(@PathVariable Long id) {
-        return appointmentRepository.findById(id).orElse(null);
-    }
-    @Autowired
-    private KafkaProducerService kafkaProducerService;
 
     @PostMapping
-    public String createAppointment(@RequestBody Appointment appointment) {
-        // Ici tu peux ajouter la logique de persistance si besoin
-        String msg = "Nouveau RDV pour patient: " + appointment.getPatientId() + " le " + appointment.getAppointmentDateTime();
-        kafkaProducerService.sendMessage(msg);
-        return "Rendez-vous créé et notification envoyée.";
+    public AppointmentResponseDTO createAppointment(@RequestBody AppointmentRequestDTO appointmentRequestDTO) {
+        return appointmentService.addAppointment(appointmentRequestDTO);
     }
+    @GetMapping("/{id}")
+    public AppointmentResponseDTO getAppointmentById(@PathVariable Long id) {
+        return  appointmentService.getAppointmentById(id);
+    }
+
+
+
     @PutMapping("/{id}")
-    public Appointment updateAppointment(@PathVariable Long id, @RequestBody Appointment updatedAppointment) {
-        return appointmentRepository.findById(id)
-                .map(appointment -> {
-                    appointment.setAppointmentDateTime(updatedAppointment.getAppointmentDateTime());
-                    appointment.setStatus(updatedAppointment.getStatus());
-                    return appointmentRepository.save(appointment);
-                })
-                .orElseGet(() -> {
-                    updatedAppointment.setId(id);
-                    return appointmentRepository.save(updatedAppointment);
-                });
+    public AppointmentResponseDTO updateAppointment(@PathVariable Long id, @RequestBody AppointmentRequestDTO appointmentRequestDTO) {
+        return  appointmentService.updateAppointment(id, appointmentRequestDTO);
     }
+
     @DeleteMapping("/{id}")
     public void deleteAppointment(@PathVariable Long id) {
-        appointmentRepository.deleteById(id);
+        appointmentService.deleteAppointment(id);
     }
 }
-
-
