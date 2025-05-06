@@ -11,6 +11,8 @@
         <module name="patient-ms" />
         <module name="doctor-ms" />
         <module name="appointment-ms" />
+        <module name="gateway-service" />
+        <module name="discovery-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -18,7 +20,9 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="MedicalRecord-ms" options="-parameters" />
       <module name="appointment-ms" options="-parameters" />
+      <module name="discovery-service" options="-parameters" />
       <module name="doctor-ms" options="-parameters" />
+      <module name="gateway-service" options="-parameters" />
       <module name="patient-ms" options="-parameters" />
     </option>
   </component>
