@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -16,4 +17,8 @@ public class MedicalRecordRequestDTO {
     private String prescription;
     private String notes;
     private LocalDate date;
+
+    private Long patientId;
+    private Long doctorId;
+
 }

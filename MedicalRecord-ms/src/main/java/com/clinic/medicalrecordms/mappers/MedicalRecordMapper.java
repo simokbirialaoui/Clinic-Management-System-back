@@ -14,4 +14,9 @@ public class MedicalRecordMapper {
         BeanUtils.copyProperties(medicalRecord, medicalRecordResponseDTO);
         return  medicalRecordResponseDTO;
     }
+    public MedicalRecord fromDTOToMedicalRecord(MedicalRecordResponseDTO medicalRecordResponseDTO){
+        MedicalRecord medicalRecord=new MedicalRecord();
+        BeanUtils.copyProperties(medicalRecordResponseDTO,medicalRecord);
+        return medicalRecord;
+    }
 }
