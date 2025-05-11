@@ -1,0 +1,32 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Logs
+logs/
+*.log
+
+# Target (Maven)
+target/
+
+# Build (Gradle)
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+
+# Java class files
+*.class
+
+# Node modules (si tu as du frontend)
+node_modules/
+
+# Environment files
+.env
