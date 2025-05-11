@@ -3,6 +3,8 @@ package com.clinic.medicalrecordms.service;
 import com.clinic.medicalrecordms.dto.MedicalRecordRequestDTO;
 import com.clinic.medicalrecordms.dto.MedicalRecordResponseDTO;
 import com.clinic.medicalrecordms.entities.MedicalRecord;
+import com.clinic.medicalrecordms.feign.DoctorRestClient;
+import com.clinic.medicalrecordms.feign.PatientRestClient;
 import com.clinic.medicalrecordms.mappers.MedicalRecordMapper;
 import com.clinic.medicalrecordms.repository.MedicalRecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,11 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Autowired
     private MedicalRecordRepository medicalRecordRepository;
     @Autowired
-     private MedicalRecordMapper medicalRecordMapper;
+    private MedicalRecordMapper medicalRecordMapper;
+    @Autowired
+    DoctorRestClient doctorRestClient;
+    @Autowired
+    PatientRestClient patientRestClient;
 
     @Override
     public MedicalRecordResponseDTO createMedicalRecord(MedicalRecordRequestDTO medicalRecordRequestDTO) {
@@ -28,11 +34,15 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 .diagnosis(medicalRecordRequestDTO.getDiagnosis())
                 .prescription(medicalRecordRequestDTO.getPrescription())
                 .notes(medicalRecordRequestDTO.getNotes())
+                .patientId(medicalRecordRequestDTO.getPatientId())
+                .doctorId(medicalRecordRequestDTO.getDoctorId())
+                .doctor(doctorRestClient.getDoctorById(medicalRecordRequestDTO.getDoctorId()))
+                .patient(patientRestClient.getPatientById(medicalRecordRequestDTO.getPatientId()))
                 .build();
 
         MedicalRecord savedMedicalRecord1 = medicalRecordRepository.save(medicalRecord);
 
-        MedicalRecordResponseDTO medicalRecordResponseDTO  = medicalRecordMapper.toResponseDTO(savedMedicalRecord1);
+        MedicalRecordResponseDTO medicalRecordResponseDTO = medicalRecordMapper.toResponseDTO(savedMedicalRecord1);
 
         return medicalRecordResponseDTO;
     }
@@ -40,15 +50,24 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     public List<MedicalRecordResponseDTO> getAllMedicalRecords() {
         List<MedicalRecord> medicalRecords = medicalRecordRepository.findAll();
+        medicalRecords.forEach(medicalRecord -> {
+            medicalRecord.setDoctor(doctorRestClient.getDoctorById(medicalRecord.getDoctorId()));
+            medicalRecord.setPatient(patientRestClient.getPatientById(medicalRecord.getPatientId()));
+        });
+
         List<MedicalRecordResponseDTO> medicalRecordResponseDTOS = medicalRecords.stream()
                 .map(medicalRecordMapper::toResponseDTO)
                 .collect(Collectors.toList());
         return medicalRecordResponseDTOS;
     }
+
     @Override
     public MedicalRecordResponseDTO getMedicalRecordById(Long id) {
         MedicalRecord medicalRecord = medicalRecordRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Medical record not found with id: " + id));
+
+        medicalRecord.setDoctor(doctorRestClient.getDoctorById(medicalRecord.getDoctorId()));
+        medicalRecord.setPatient(patientRestClient.getPatientById(medicalRecord.getPatientId()));
         return medicalRecordMapper.toResponseDTO(medicalRecord);
     }
 
@@ -63,6 +82,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         medicalRecord.setPrescription(medicalRecordRequestDTO.getPrescription());
 
         MedicalRecord updatedMedicalRecord = medicalRecordRepository.save(medicalRecord);
+        updatedMedicalRecord.setDoctor(doctorRestClient.getDoctorById(updatedMedicalRecord.getDoctorId()));
+        updatedMedicalRecord.setPatient(patientRestClient.getPatientById(updatedMedicalRecord.getPatientId()));
         return medicalRecordMapper.toResponseDTO(updatedMedicalRecord);
     }
 

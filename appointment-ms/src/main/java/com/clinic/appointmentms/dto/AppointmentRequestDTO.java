@@ -15,4 +15,7 @@ import java.time.LocalDateTime;
 public class AppointmentRequestDTO {
     private LocalDateTime appointmentDateTime;
     private Status status; // BOOKED, CANCELLED, COMPLETED
+
+    private Long patientId;
+    private Long doctorId;
 }

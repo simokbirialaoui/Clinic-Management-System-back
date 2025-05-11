@@ -2,6 +2,8 @@ package com.clinic.appointmentms.service;
 
 import com.clinic.appointmentms.dto.AppointmentRequestDTO;
 import com.clinic.appointmentms.dto.AppointmentResponseDTO;
+import com.clinic.appointmentms.feign.DoctorRestClient;
+import com.clinic.appointmentms.feign.PatientRestClient;
 
 import java.util.List;
 

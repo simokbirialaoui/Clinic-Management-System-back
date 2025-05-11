@@ -3,6 +3,8 @@ package com.clinic.appointmentms.service;
 import com.clinic.appointmentms.dto.AppointmentRequestDTO;
 import com.clinic.appointmentms.dto.AppointmentResponseDTO;
 import com.clinic.appointmentms.entities.Appointment;
+import com.clinic.appointmentms.feign.DoctorRestClient;
+import com.clinic.appointmentms.feign.PatientRestClient;
 import com.clinic.appointmentms.mappers.AppointmentMapper;
 import com.clinic.appointmentms.repository.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,20 @@ public class AppointmentServiceImpl implements AppointmentService {
     private  AppointmentRepository appointmentRepository;
     @Autowired
     private AppointmentMapper appointmentMapper;
-
+    @Autowired
+    DoctorRestClient doctorRestClient;
+    @Autowired
+    PatientRestClient patientRestClient;
 
     @Override
     public AppointmentResponseDTO addAppointment(AppointmentRequestDTO appointmentDTO) {
         Appointment appointment = Appointment.builder()
                 .appointmentDateTime(appointmentDTO.getAppointmentDateTime())
                 .status(appointmentDTO.getStatus())
+                .patientId(appointmentDTO.getPatientId())
+                .doctorId(appointmentDTO.getDoctorId())
+                .doctor(doctorRestClient.getDoctorById(appointmentDTO.getDoctorId()))
+                .patient(patientRestClient.getPatientById(appointmentDTO.getPatientId()))
                 .build();
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
@@ -39,15 +48,22 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<AppointmentResponseDTO> getAllAppointments() {
         List<Appointment> appointments = appointmentRepository.findAll();
-        List<AppointmentResponseDTO> appointmentResponseDTOs = appointments.stream()
+
+        appointments.forEach(appointment -> {
+            appointment.setDoctor(doctorRestClient.getDoctorById(appointment.getDoctorId()));
+            appointment.setPatient(patientRestClient.getPatientById(appointment.getPatientId()));
+        });
+
+        return appointments.stream()
                 .map(appointmentMapper::toResponseDTO)
                 .collect(Collectors.toList());
-        return appointmentResponseDTOs;
     }
     @Override
     public AppointmentResponseDTO getAppointmentById(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found with id: " + id));
+        appointment.setDoctor(doctorRestClient.getDoctorById(appointment.getDoctorId()));
+        appointment.setPatient(patientRestClient.getPatientById(appointment.getPatientId()));
         return appointmentMapper.toResponseDTO(appointment);
     }
 
@@ -60,6 +76,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setStatus(appointmentRequestDTO.getStatus());
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
+        updatedAppointment.setDoctor(doctorRestClient.getDoctorById(updatedAppointment.getDoctorId()));
+        updatedAppointment.setPatient(patientRestClient.getPatientById(updatedAppointment.getPatientId()));
         return appointmentMapper.toResponseDTO(updatedAppointment);
     }
 
