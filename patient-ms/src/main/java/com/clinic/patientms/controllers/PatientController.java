@@ -43,7 +43,7 @@ public class PatientController {
     public PatientDTO createPatient(@RequestBody PatientDTO patientDTO) {
         Patient patient = patientMapper.fromPatientDTO(patientDTO);
         Patient savedPatient = repositoryPatient.save(patient);
-        patientProducer.sendPatientData(savedPatient);
+      //  patientProducer.sendPatientData(savedPatient);
         return patientMapper.fromPatient(savedPatient);
     }
 
