@@ -2,6 +2,10 @@ package com.clinic.doctorms.dtos;
 
 import lombok.*;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,4 +17,7 @@ public class DoctorDto {
     private String email;
     private String phone;
     private String specialization;
+    private List<DayOfWeek> availableDays;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

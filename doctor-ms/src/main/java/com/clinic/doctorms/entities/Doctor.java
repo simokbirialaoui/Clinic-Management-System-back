@@ -1,9 +1,10 @@
 package com.clinic.doctorms.entities;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.List;
 
 @Entity @Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
 public class Doctor {
@@ -15,4 +16,9 @@ public class Doctor {
     private String email;
     private String phone;
     private String specialization;
+    @ElementCollection
+    private List<DayOfWeek> availableDays;
+
+    private LocalTime startTime; // e.g., 09:00
+    private LocalTime endTime;   // e.g., 17:00
 }
