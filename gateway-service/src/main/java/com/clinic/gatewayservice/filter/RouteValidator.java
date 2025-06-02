@@ -1,5 +1,4 @@
-package com.javatechie.filter;
-
+package com.clinic.gatewayservice.filter;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +9,11 @@ import java.util.function.Predicate;
 public class RouteValidator {
 
     public static final List<String> openApiEndpoints = List.of(
-            "/auth/register",
-            "/auth/token",
+            "/identity-service/auth/register",
+            "/identity-service/auth/token",
             "/eureka"
     );
+
 
     public Predicate<ServerHttpRequest> isSecured =
             request -> openApiEndpoints

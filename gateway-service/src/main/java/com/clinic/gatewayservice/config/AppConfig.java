@@ -1,4 +1,4 @@
-package com.javatechie.config;
+package com.clinic.gatewayservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
