@@ -30,8 +30,22 @@ public class ApiGatewayConfiguration {
                         .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config()))
                                 .rewritePath("/identity-service/(?<segment>.*)", "/${segment}"))
                         .uri("lb://IDENTITY-SERVICE")) // Load balancer vers identity-service
+                // Route pour doctor-ms
+                .route("doctor-ms", r -> r.path("/doctor-ms/**")
+                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config()))
+                                .rewritePath("/doctor-ms/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://DOCTOR-MS")) // Load balancer vers doctor-ms
+                // Route pour appointment-ms
+                .route("appointment-ms", r -> r.path("/appointment-ms/**")
+                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config()))
+                                .rewritePath("/appointment-ms/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://APPOINTMENT-MS")) // Load balancer vers appointment-ms
 
-                // Ajouter d'autres routes ici
+                // Route pour MedicalRecord-ms
+                .route("medicalrecord-ms", r -> r.path("/medicalrecord-ms/**")
+                        .filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config()))
+                                .rewritePath("/medicalrecord-ms/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://MEDICALRECORD-MS")) // Load balancer vers MedicalRecord-ms
                 .build();
     }
 }

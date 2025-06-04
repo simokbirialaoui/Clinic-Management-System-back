@@ -21,19 +21,6 @@ public class JwtService {
 
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
-    public void validateToken(String token) {
-        Jwts.parserBuilder()
-                .setSigningKey(getSignKey())
-                .build()
-                .parseClaimsJws(token);
-    }
-
-    private Key getSignKey() {
-        byte[] keyBytes = HexFormat.of().parseHex(SECRET);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userName);
@@ -44,19 +31,52 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // 30 minutes
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
-
-
-    private static byte[] hexStringToByteArray(String hex) {
-        int len = hex.length();
-        byte[] bytes = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            bytes[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
-                    + Character.digit(hex.charAt(i+1), 16));
-        }
-        return bytes;
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    private Key getSignKey() {
+        byte[] keyBytes = HexFormat.of().parseHex(SECRET);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public void validateToken(String token) {
+        Jwts.parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token);
+    }
+
 }
