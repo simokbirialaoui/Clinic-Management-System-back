@@ -49,6 +49,7 @@ http://localhost:8888/appointment-ms/api/appointments
 http://localhost:8888/medicalrecord-ms/api/medical-records
 http://localhost:9898/auth/user
 http://localhost:9898/auth/token
+http://localhost:9898/swagger-ui/index.html#/auth-controller/getToken
 
 
 

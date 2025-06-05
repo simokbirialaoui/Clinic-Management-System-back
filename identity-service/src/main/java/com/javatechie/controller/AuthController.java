@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -55,8 +57,14 @@ public class AuthController {
         UserCredential user = userCredentialRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new UserResponseDto(user.getId(), user.getName(), user.getEmail());
+        // Extraire les noms des rôles
+        Set<String> roleNames = user.getRoles().stream()
+                .map(role -> role.getName())
+                .collect(Collectors.toSet());
+
+        return new UserResponseDto(user.getId(), user.getName(), user.getEmail(), roleNames);
     }
+
 
 
 }
