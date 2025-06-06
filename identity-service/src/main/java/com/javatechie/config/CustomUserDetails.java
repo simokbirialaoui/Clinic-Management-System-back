@@ -10,11 +10,11 @@ import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
 
-    private String username;
+    private String email;  // changer le nom de la variable pour être clair
     private String password;
 
     public CustomUserDetails(UserCredential userCredential) {
-        this.username = userCredential.getName();
+        this.email = userCredential.getEmail();  // récupérer l'email ici
         this.password = userCredential.getPassword();
     }
 
@@ -31,7 +31,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;  // retourne l'email comme username pour Spring Security
     }
 
     @Override

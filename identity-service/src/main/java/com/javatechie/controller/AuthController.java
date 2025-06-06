@@ -33,13 +33,16 @@ public class AuthController {
 
     @PostMapping("/token")
     public String getToken(@RequestBody AuthRequest authRequest) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        Authentication authenticate = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
+        );
         if (authenticate.isAuthenticated()) {
-            return service.generateToken(authRequest.getUsername());
+            return service.generateToken(authRequest.getEmail());
         } else {
             throw new RuntimeException("invalid access");
         }
     }
+
 
     @GetMapping("/validate")
     public String validateToken(@RequestParam("token") String token) {
@@ -53,8 +56,8 @@ public class AuthController {
 
     @GetMapping("/user")
     public UserResponseDto getCurrentUser(Principal principal) {
-        String username = principal.getName();
-        UserCredential user = userCredentialRepository.findByName(username)
+        String email = principal.getName();
+        UserCredential user = userCredentialRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Extraire les noms des rôles
