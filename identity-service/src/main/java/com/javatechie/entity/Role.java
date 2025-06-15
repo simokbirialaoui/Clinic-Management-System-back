@@ -1,12 +1,10 @@
 package com.javatechie.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.Set;
 
 @Entity
 @Data
@@ -19,4 +17,12 @@ public class Role {
     private int id;
 
     private String name;  // ex: "ROLE_ADMIN", "ROLE_USER"
+
+    @ManyToMany
+    @JoinTable(
+            name = "menu_roles",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_id")
+    )
+    private Set<MenuItem> menus;
 }

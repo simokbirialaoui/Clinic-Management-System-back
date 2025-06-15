@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.Set;
 
 @Entity
@@ -20,11 +21,7 @@ public class MenuItem {
     private String icon;  // ex: "tachometer-alt"
     private String path;  // ex: "/dashboard"
 
-    @ManyToMany
-    @JoinTable(
-            name = "menu_roles",
-            joinColumns = @JoinColumn(name = "menu_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+    // Optionnel : pour garder l'accès inverse (lecture seule)
+    @ManyToMany(mappedBy = "menus")
     private Set<Role> roles;
 }
