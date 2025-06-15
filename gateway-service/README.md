@@ -51,7 +51,18 @@ http://localhost:9898/auth/user
 http://localhost:9898/auth/token
 http://localhost:9898/swagger-ui/index.html#/auth-controller/getToken
 
+INSERT INTO `menuitem` (`icon`, `path`, `title`) VALUES
+('flaticon-menu-1', '/dashboard', 'dashboard'),
+('flaticon-calendar', '/appointments', 'appointments'),
+('flaticon-user-1', '/patients', 'patients'),
+('flaticon-user', '/doctors', 'doctors'),
+('flaticon-envelope', '/messages', 'messages'),
+('flaticon-setting', '/settings', 'settings');
 
+INSERT INTO `role` (`name`) VALUES
+('admin'),
+('patient'),
+('doctor');
 
 
 
