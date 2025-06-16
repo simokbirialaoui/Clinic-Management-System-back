@@ -20,11 +20,6 @@ public class MenuItem {
     private String icon;  // ex: "tachometer-alt"
     private String path;  // ex: "/dashboard"
 
-    @ManyToMany
-    @JoinTable(
-            name = "menu_roles",
-            joinColumns = @JoinColumn(name = "menu_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+    @ManyToMany(mappedBy = "routes")
     private Set<Role> roles;
 }
