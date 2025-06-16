@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,7 @@ public class MenuItem {
     private String icon;  // ex: "tachometer-alt"
     private String path;  // ex: "/dashboard"
 
-    @ManyToMany(mappedBy = "routes")
+    // Optionnel : pour garder l'accès inverse (lecture seule)
+    @ManyToMany(mappedBy = "menus")
     private Set<Role> roles;
 }

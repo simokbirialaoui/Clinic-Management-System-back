@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.Set;
 
 @Entity
@@ -16,12 +15,14 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;  // ex: "ROLE_ADMIN", "ROLE_USER"
-    @ManyToMany(fetch = FetchType.EAGER)
+
+    @ManyToMany
     @JoinTable(
-            name = "role_routes",
+            name = "menu_roles",
             joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "route_id")
+            inverseJoinColumns = @JoinColumn(name = "menu_id")
     )
-    private Set<MenuItem> routes;
+    private Set<MenuItem> menus;
 }
