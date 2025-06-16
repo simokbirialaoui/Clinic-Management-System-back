@@ -1,12 +1,21 @@
 package com.javatechie.controller;
 
+import com.javatechie.dto.MenuItemDto;
+import com.javatechie.dto.RoleDto;
+import com.javatechie.dto.RoleResponseDto;
+import com.javatechie.entity.MenuItem;
 import com.javatechie.entity.Role;
+import com.javatechie.repository.MenuItemRepository;
 import com.javatechie.repository.RoleRepository;
+import com.javatechie.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth/roles")
@@ -15,63 +24,69 @@ public class RoleController {
     @Autowired
     private RoleRepository roleRepository;
 
-    // Récupérer tous les rôles
-    @GetMapping
-    public ResponseEntity<List<Role>> getAllRoles() {
-        return ResponseEntity.ok(roleRepository.findAll());
+    @Autowired
+    private MenuItemRepository menuItemRepository;
+
+    private final RoleService roleService;
+
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
     }
 
-    // Récupérer un rôle par ID
     @GetMapping("/{id}")
-    public ResponseEntity<Role> getRoleById(@PathVariable int id) {
-        return roleRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<RoleResponseDto> getRoleById(@PathVariable int id) {
+        return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    // Récupérer un rôle par nom (ex: "ROLE_ADMIN")
-    @GetMapping("/by-name/{roleName}")
-    public ResponseEntity<Role> getRoleByName(@PathVariable String roleName) {
-        return roleRepository.findByName(roleName)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping
+    public ResponseEntity<List<RoleResponseDto>> getAllRoles() {
+        return ResponseEntity.ok(roleService.getAllRoles());
     }
 
-    // Récupérer les menus d’un rôle par nom simple (ex: "admin")
-    @GetMapping("/{roleName}/menus")
-    public ResponseEntity<?> getMenusByRoleName(@PathVariable String roleName) {
-        String roleFullName = "ROLE_" + roleName.toUpperCase();
-        return roleRepository.findByName(roleFullName)
-                .map(role -> ResponseEntity.ok(role.getMenus()))
-                .orElse(ResponseEntity.notFound().build());
-    }
 
-    // Créer un rôle
+
     @PostMapping
-    public ResponseEntity<Role> createRole(@RequestBody Role role) {
+    public ResponseEntity<RoleResponseDto> createRole(@RequestBody RoleDto dto) {
+        Role role = new Role();
+        role.setName(dto.getName());
+        Set<MenuItem> menus = new HashSet<>(menuItemRepository.findAllById(dto.getMenuIds()));
+        role.setMenus(menus);
         Role saved = roleRepository.save(role);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(mapToDto(saved));
     }
 
-    // Mettre à jour un rôle
     @PutMapping("/{id}")
-    public ResponseEntity<Role> updateRole(@PathVariable int id, @RequestBody Role updatedRole) {
+    public ResponseEntity<RoleResponseDto> updateRole(@PathVariable int id, @RequestBody RoleDto roleDto) {
         return roleRepository.findById(id)
                 .map(role -> {
-                    role.setName(updatedRole.getName());
-                    role.setMenus(updatedRole.getMenus());
-                    return ResponseEntity.ok(roleRepository.save(role));
+                    role.setName(roleDto.getName());
+                    Set<MenuItem> menus = new HashSet<>();
+                    if (roleDto.getMenuIds() != null && !roleDto.getMenuIds().isEmpty()) {
+                        menus = new HashSet<>(menuItemRepository.findAllById(roleDto.getMenuIds()));
+                    }
+                    role.setMenus(menus);
+                    Role updated = roleRepository.save(role);
+                    return ResponseEntity.ok(mapToDto(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Supprimer un rôle
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable int id) {
-        if (roleRepository.existsById(id)) {
-            roleRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        if (!roleRepository.existsById(id)) return ResponseEntity.notFound().build();
+        roleRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Mapper helper
+    private RoleResponseDto mapToDto(Role role) {
+        RoleResponseDto dto = new RoleResponseDto();
+        dto.setId(role.getId());
+        dto.setName(role.getName());
+        Set<MenuItemDto> menuDtos = role.getMenus().stream()
+                .map(m -> new MenuItemDto(m.getId(), m.getTitle(), m.getIcon(), m.getPath()))
+                .collect(Collectors.toSet());
+        dto.setMenus(menuDtos);
+        return dto;
     }
 }
