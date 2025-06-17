@@ -13,5 +13,5 @@ public class UserResponseDto {
     private String name;
     private String email;
 
-    private Set<String> roles;  // Liste des noms de rôles (ex: ROLE_ADMIN, ROLE_USER)
+    private Set<RoleDto> roles;
 }

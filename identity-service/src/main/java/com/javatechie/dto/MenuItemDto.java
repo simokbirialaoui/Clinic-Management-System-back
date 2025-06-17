@@ -13,4 +13,5 @@ public class MenuItemDto {
     private String title;
     private String icon;
     private String path;
+    private Integer order;
 }

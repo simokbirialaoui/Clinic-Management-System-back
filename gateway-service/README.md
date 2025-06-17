@@ -65,6 +65,12 @@ INSERT INTO `role` (`name`) VALUES
 ('doctor');
 
 
+UPDATE menuitem
+SET `display_order` = id
+WHERE `display_order` IS NULL;
+
+
+
 
 
 

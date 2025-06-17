@@ -12,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import java.util.LinkedHashSet;
 @RestController
 @RequestMapping("/auth/roles")
 public class RoleController {
@@ -49,27 +50,44 @@ public class RoleController {
     public ResponseEntity<RoleResponseDto> createRole(@RequestBody RoleDto dto) {
         Role role = new Role();
         role.setName(dto.getName());
-        Set<MenuItem> menus = new HashSet<>(menuItemRepository.findAllById(dto.getMenuIds()));
-        role.setMenus(menus);
+
+        if (dto.getMenus() != null && !dto.getMenus().isEmpty()) {
+            Set<Long> menuIds = dto.getMenus().stream()
+                    .map(MenuItemDto::getId)
+                    .collect(Collectors.toSet());
+
+            Set<MenuItem> menus = new HashSet<>(menuItemRepository.findAllById(menuIds));
+            role.setMenus(menus);
+        }
+
         Role saved = roleRepository.save(role);
         return ResponseEntity.ok(mapToDto(saved));
     }
 
+
     @PutMapping("/{id}")
-    public ResponseEntity<RoleResponseDto> updateRole(@PathVariable int id, @RequestBody RoleDto roleDto) {
+    public ResponseEntity<RoleResponseDto> updateRole(@PathVariable int id, @RequestBody RoleDto dto) {
         return roleRepository.findById(id)
                 .map(role -> {
-                    role.setName(roleDto.getName());
-                    Set<MenuItem> menus = new HashSet<>();
-                    if (roleDto.getMenuIds() != null && !roleDto.getMenuIds().isEmpty()) {
-                        menus = new HashSet<>(menuItemRepository.findAllById(roleDto.getMenuIds()));
+                    role.setName(dto.getName());
+
+                    if (dto.getMenus() != null && !dto.getMenus().isEmpty()) {
+                        Set<Long> menuIds = dto.getMenus().stream()
+                                .map(MenuItemDto::getId)
+                                .collect(Collectors.toSet());
+
+                        Set<MenuItem> menus = new HashSet<>(menuItemRepository.findAllById(menuIds));
+                        role.setMenus(menus);
+                    } else {
+                        role.getMenus().clear();
                     }
-                    role.setMenus(menus);
+
                     Role updated = roleRepository.save(role);
                     return ResponseEntity.ok(mapToDto(updated));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable int id) {
@@ -83,10 +101,24 @@ public class RoleController {
         RoleResponseDto dto = new RoleResponseDto();
         dto.setId(role.getId());
         dto.setName(role.getName());
+
         Set<MenuItemDto> menuDtos = role.getMenus().stream()
-                .map(m -> new MenuItemDto(m.getId(), m.getTitle(), m.getIcon(), m.getPath()))
-                .collect(Collectors.toSet());
+                // Tri par 'order' si existant, sinon par titre (optionnel)
+                .sorted(Comparator
+                        .comparing(MenuItem::getOrder, Comparator.nullsLast(Integer::compareTo))
+                        .thenComparing(menu -> menu.getTitle().toLowerCase())
+                )
+                .map(m -> new MenuItemDto(
+                        m.getId(),
+                        m.getTitle(),
+                        m.getIcon(),
+                        m.getPath(),
+                        m.getOrder()  // si MenuItemDto a ce champ
+                ))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
         dto.setMenus(menuDtos);
         return dto;
     }
+
 }

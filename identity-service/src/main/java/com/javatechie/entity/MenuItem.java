@@ -29,6 +29,9 @@ public class MenuItem {
     @Column(nullable = false, length = 200)
     private String path;
 
+    @Column(name = "display_order")  // nom de colonne personnalisé
+    private Integer order;
+
     @ManyToMany(mappedBy = "menus", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnore
     @Setter(AccessLevel.PRIVATE)  // Empêche l'accès direct au setter
@@ -55,7 +58,7 @@ public class MenuItem {
         private String title;
         private String icon;
         private String path;
-
+        private Integer order;
         public MenuItemBuilder id(Long id) {
             this.id = id;
             return this;
@@ -82,6 +85,7 @@ public class MenuItem {
             menuItem.setTitle(title);
             menuItem.setIcon(icon);
             menuItem.setPath(path);
+            menuItem.setOrder(order);
             return menuItem;
         }
     }

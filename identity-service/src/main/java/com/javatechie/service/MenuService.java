@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,18 +34,35 @@ public class MenuService {
     }
 
     public List<MenuItemDto> getMenuForUserRoles(List<String> roles) {
-        // Logique ici selon les rôles : ex. filtre des menus
-        List<MenuItem> menuItems = menuRepo.findAll(); // ou par rôle
+        // TODO: ajouter logique de filtre selon les rôles, ici on récupère tout pour l'exemple
+        List<MenuItem> menuItems = menuRepo.findAll();
 
         return menuItems.stream()
-                .map(menu -> new MenuItemDto(menu.getId(), menu.getTitle(), menu.getIcon(), menu.getPath()))
+                .sorted(Comparator.comparing(MenuItem::getOrder, Comparator.nullsLast(Integer::compareTo))) // tri par order, null à la fin
+                .map(menu -> new MenuItemDto(
+                        menu.getId(),
+                        menu.getTitle(),
+                        menu.getIcon(),
+                        menu.getPath(),
+                        menu.getOrder()  // ajout du champ order
+                ))
                 .collect(Collectors.toList());
     }
+
     public List<MenuItemDto> getAllMenus() {
         List<MenuItem> menuItems = menuRepo.findAll();
+
         return menuItems.stream()
-                .map(menu -> new MenuItemDto(menu.getId(), menu.getTitle(), menu.getIcon(), menu.getPath()))
+                .sorted(Comparator.comparing(MenuItem::getOrder, Comparator.nullsLast(Integer::compareTo))) // tri par order
+                .map(menu -> new MenuItemDto(
+                        menu.getId(),
+                        menu.getTitle(),
+                        menu.getIcon(),
+                        menu.getPath(),
+                        menu.getOrder()  // ajout du champ order
+                ))
                 .collect(Collectors.toList());
     }
+
 
 }
