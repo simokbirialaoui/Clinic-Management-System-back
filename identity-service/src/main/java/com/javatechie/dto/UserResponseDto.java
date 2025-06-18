@@ -10,8 +10,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserResponseDto {
     private int id;
-    private String name;
+    private String firstName;
+    private String lastName;
     private String email;
-
+    private String phone;
     private Set<RoleDto> roles;
 }

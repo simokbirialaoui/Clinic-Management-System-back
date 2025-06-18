@@ -84,8 +84,10 @@ public class AuthController {
 
         return new UserResponseDto(
                 user.getId(),
-                user.getName(),
+                user.getFirstName(),
+                user.getLastName(),
                 user.getEmail(),
+                user.getPhone(),
                 roleDtos
         );
     }
