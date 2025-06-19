@@ -37,7 +37,8 @@ public class AuthConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {}) // <-- active CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/token", "/auth/validate","/auth/menus",
+                        .requestMatchers("/auth/register", "/auth/token", "/auth/validate","/auth/menus", "/auth/forgot-password",
+                                "/auth/reset-password",
                                 "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )

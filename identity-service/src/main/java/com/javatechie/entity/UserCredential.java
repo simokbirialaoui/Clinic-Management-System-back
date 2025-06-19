@@ -20,6 +20,7 @@ public class UserCredential {
     private String phone;
     private String email;
     private String password;
+    private String resetToken;
 
     @ManyToMany(fetch = FetchType.EAGER)  // Chargement immédiat des roles avec l'utilisateur
     @JoinTable(

@@ -1,14 +1,12 @@
 package com.javatechie.controller;
 
-import com.javatechie.dto.AuthRequest;
-import com.javatechie.dto.MenuItemDto;
-import com.javatechie.dto.RoleDto;
-import com.javatechie.dto.UserResponseDto;
+import com.javatechie.dto.*;
 import com.javatechie.entity.MenuItem;
 import com.javatechie.entity.UserCredential;
 import com.javatechie.repository.UserCredentialRepository;
 import com.javatechie.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -94,6 +92,16 @@ public class AuthController {
 
 
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        service.forgotPassword(request.getEmail());
+        return ResponseEntity.ok("Email de réinitialisation envoyé");
+    }
 
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        service.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Mot de passe réinitialisé avec succès");
+    }
 
 }
