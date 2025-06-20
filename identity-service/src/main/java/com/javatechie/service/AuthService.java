@@ -41,14 +41,16 @@ public class AuthService {
         mailService.sendResetToken(email, token);
     }
 
-    public void resetPassword(String token, String newPassword) {
+    public String resetPassword(String token, String newPassword) {
         UserCredential user = userCredentialRepository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("Token invalide ou expiré"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setResetToken(null);
         userCredentialRepository.save(user);
+        return user.getEmail(); // Retourner l'e-mail
     }
+
 
 
 

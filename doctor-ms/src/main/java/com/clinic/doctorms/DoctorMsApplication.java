@@ -17,7 +17,8 @@ public class DoctorMsApplication {
     public static void main(String[] args) {
         SpringApplication.run(DoctorMsApplication.class, args);
     }
-
+}
+/*
     @Bean
     CommandLineRunner initDatabase(RepositoryDoctor repository) {
         return args -> {
@@ -46,3 +47,5 @@ public class DoctorMsApplication {
     }
 
 }
+
+ */
