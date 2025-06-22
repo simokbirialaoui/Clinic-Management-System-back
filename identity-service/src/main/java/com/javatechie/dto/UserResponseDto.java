@@ -9,7 +9,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDto {
-    private int id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
