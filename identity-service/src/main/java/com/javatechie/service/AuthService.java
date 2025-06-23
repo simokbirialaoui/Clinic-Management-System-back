@@ -3,13 +3,15 @@ package com.javatechie.service;
 import com.javatechie.entity.UserCredential;
 import com.javatechie.repository.UserCredentialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,40 +27,71 @@ public class AuthService {
     private JwtService jwtService;
 
     @Autowired
-    private UserCredentialRepository userCredentialRepository;
-
-    @Autowired
     private MailService mailService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private SystemTokenProvider systemTokenProvider;
+
     public void forgotPassword(String email) {
-        UserCredential user = userCredentialRepository.findByEmail(email)
+        UserCredential user = repository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
-        userCredentialRepository.save(user);
+        repository.save(user);
 
         mailService.sendResetToken(email, token);
     }
 
     public String resetPassword(String token, String newPassword) {
-        UserCredential user = userCredentialRepository.findByResetToken(token)
+        UserCredential user = repository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("Token invalide ou expiré"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setResetToken(null);
-        userCredentialRepository.save(user);
-        return user.getEmail(); // Retourner l'e-mail
+        repository.save(user);
+        return user.getEmail();
     }
-
-
-
-
 
     public String saveUser(UserCredential credential) {
         credential.setPassword(passwordEncoder.encode(credential.getPassword()));
         repository.save(credential);
+
+        boolean isPatient = credential.getRoles().stream()
+                .anyMatch(role -> "PATIENT".equalsIgnoreCase(role.getName()));
+
+        if (isPatient) {
+            createPatientInPatientMs(credential);
+        }
+
         return "user added to the system";
+    }
+
+    private void createPatientInPatientMs(UserCredential user) {
+        String url = "http://localhost:8082/api/patients";
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("firstName", user.getFirstName());
+        request.put("lastName", user.getLastName());
+        request.put("email", user.getEmail());
+        request.put("phone", user.getPhone());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(systemTokenProvider.getSystemToken());
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+            System.out.println("✅ Patient créé dans patient-ms : " + response.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("❌ Erreur création patient dans patient-ms: " + e.getMessage());
+        }
     }
 
     public String generateToken(String email) {
