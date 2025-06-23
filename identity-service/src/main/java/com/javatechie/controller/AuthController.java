@@ -140,5 +140,64 @@ public class AuthController {
         return ResponseEntity.ok(userDtos);
     }
 
+    @PutMapping("/users/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserCredential updatedUser) {
+        Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserCredential existingUser = optionalUser.get();
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setPhone(updatedUser.getPhone());
+
+        // Si tu veux aussi mettre à jour les rôles :
+        existingUser.setRoles(updatedUser.getRoles());
+
+        userCredentialRepository.save(existingUser);
+        return ResponseEntity.ok("Utilisateur mis à jour avec succès");
+    }
+    @GetMapping("/users/{id}")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
+        Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserCredential user = optionalUser.get();
+
+        Set<RoleDto> roleDtos = user.getRoles().stream()
+                .map(role -> {
+                    Set<MenuItemDto> menuDtos = role.getMenus().stream()
+                            .sorted(Comparator
+                                    .comparing(MenuItem::getOrder, Comparator.nullsLast(Integer::compareTo))
+                                    .thenComparing(menu -> menu.getTitle().toLowerCase())
+                            )
+                            .map(menu -> new MenuItemDto(
+                                    menu.getId(),
+                                    menu.getTitle(),
+                                    menu.getIcon(),
+                                    menu.getPath(),
+                                    menu.getOrder()
+                            ))
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
+
+                    return new RoleDto(role.getName(), menuDtos);
+                })
+                .collect(Collectors.toSet());
+
+        UserResponseDto responseDto = new UserResponseDto(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getPhone(),
+                roleDtos
+        );
+
+        return ResponseEntity.ok(responseDto);
+    }
 
 }
