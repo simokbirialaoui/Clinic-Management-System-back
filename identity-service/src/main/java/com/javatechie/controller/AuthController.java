@@ -13,11 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.LinkedHashSet;
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
@@ -102,6 +100,44 @@ public class AuthController {
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
         String email = service.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Mot de passe réinitialisé avec succès : " + email);
+    }
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        List<UserCredential> users = userCredentialRepository.findAll();
+
+        List<UserResponseDto> userDtos = users.stream()
+                .map(user -> {
+                    Set<RoleDto> roleDtos = user.getRoles().stream()
+                            .map(role -> {
+                                Set<MenuItemDto> menuDtos = role.getMenus().stream()
+                                        .sorted(Comparator
+                                                .comparing(MenuItem::getOrder, Comparator.nullsLast(Integer::compareTo))
+                                                .thenComparing(menu -> menu.getTitle().toLowerCase())
+                                        )
+                                        .map(menu -> new MenuItemDto(
+                                                menu.getId(),
+                                                menu.getTitle(),
+                                                menu.getIcon(),
+                                                menu.getPath(),
+                                                menu.getOrder()
+                                        ))
+                                        .collect(Collectors.toCollection(LinkedHashSet::new));
+                                return new RoleDto(role.getName(), menuDtos);
+                            })
+                            .collect(Collectors.toSet());
+
+                    return new UserResponseDto(
+                            user.getId(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getEmail(),
+                            user.getPhone(),
+                            roleDtos
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(userDtos);
     }
 
 
