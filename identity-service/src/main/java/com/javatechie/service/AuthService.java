@@ -66,7 +66,12 @@ public class AuthService {
         if (isPatient) {
             createPatientInPatientMs(credential);
         }
+        boolean isDoctor = credential.getRoles().stream()
+                .anyMatch(role -> "DOCTOR".equalsIgnoreCase(role.getName()));
 
+        if (isDoctor) {
+            createDoctorInDoctorMs(credential);
+        }
         return "user added to the system";
     }
 
@@ -91,6 +96,30 @@ public class AuthService {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("❌ Erreur création patient dans patient-ms: " + e.getMessage());
+        }
+    }
+    private void createDoctorInDoctorMs(UserCredential user) {
+        String url = "http://localhost:8081/api/doctors";  // URL de ton microservice doctor-ms
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("firstName", user.getFirstName());
+        request.put("lastName", user.getLastName());
+        request.put("email", user.getEmail());
+        request.put("phone", user.getPhone());
+        // Ajoute d'autres champs spécifiques aux médecins si besoin
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(systemTokenProvider.getSystemToken());  // Token technique pour appel inter-service
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+            System.out.println("✅ Doctor créé dans doctor-ms : " + response.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("❌ Erreur création doctor dans doctor-ms: " + e.getMessage());
         }
     }
 
