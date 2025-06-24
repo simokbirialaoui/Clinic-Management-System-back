@@ -21,6 +21,9 @@ public class UserCredential {
     private String email;
     private String password;
     private String resetToken;
+    @Column(name = "deleted")
+    private Boolean deleted = false;
+
 
     @ManyToMany(fetch = FetchType.EAGER)  // Chargement immédiat des roles avec l'utilisateur
     @JoinTable(

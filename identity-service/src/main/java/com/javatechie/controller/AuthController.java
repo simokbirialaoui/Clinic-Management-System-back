@@ -103,7 +103,7 @@ public class AuthController {
     }
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
-        List<UserCredential> users = userCredentialRepository.findAll();
+        List<UserCredential> users = userCredentialRepository.findByDeletedFalse();
 
         List<UserResponseDto> userDtos = users.stream()
                 .map(user -> {
@@ -139,6 +139,7 @@ public class AuthController {
 
         return ResponseEntity.ok(userDtos);
     }
+
 
     @PutMapping("/users/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserCredential updatedUser) {
@@ -198,6 +199,19 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(responseDto);
+    }
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserCredential user = optionalUser.get();
+        user.setDeleted(true);
+        userCredentialRepository.save(user);
+
+        return ResponseEntity.ok("Utilisateur marqué comme supprimé");
     }
 
 }
