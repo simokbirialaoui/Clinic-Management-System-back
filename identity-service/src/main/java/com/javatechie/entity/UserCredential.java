@@ -23,6 +23,7 @@ public class UserCredential {
     private String resetToken;
     @Column(name = "deleted")
     private Boolean deleted = false;
+    private Long patientId;
 
 
     @ManyToMany(fetch = FetchType.EAGER)  // Chargement immédiat des roles avec l'utilisateur

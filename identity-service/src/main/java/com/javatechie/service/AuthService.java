@@ -1,5 +1,6 @@
 package com.javatechie.service;
 
+import com.javatechie.dto.PatientResponse;
 import com.javatechie.entity.UserCredential;
 import com.javatechie.repository.UserCredentialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,13 +92,22 @@ public class AuthService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-            System.out.println("✅ Patient créé dans patient-ms : " + response.getBody());
+            ResponseEntity<PatientResponse> response = restTemplate.postForEntity(url, entity, PatientResponse.class);
+            Long patientId = response.getBody().getId();
+
+            System.out.println("✅ Patient créé dans patient-ms : ID = " + patientId);
+
+            // Sauvegarder patientId dans l'utilisateur
+            user.setPatientId(patientId);
+            repository.save(user);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("❌ Erreur création patient dans patient-ms: " + e.getMessage());
         }
     }
+
+
     private void createDoctorInDoctorMs(UserCredential user) {
         String url = "http://localhost:8081/api/doctors";  // URL de ton microservice doctor-ms
 

@@ -59,7 +59,6 @@ public class AuthController {
 
         Set<RoleDto> roleDtos = user.getRoles().stream()
                 .map(role -> {
-                    // Tri par order, puis titre
                     Set<MenuItemDto> menuDtos = role.getMenus().stream()
                             .sorted(Comparator
                                     .comparing(MenuItem::getOrder, Comparator.nullsLast(Integer::compareTo))
@@ -70,7 +69,7 @@ public class AuthController {
                                     menu.getTitle(),
                                     menu.getIcon(),
                                     menu.getPath(),
-                                    menu.getOrder()  // ajouter si MenuItemDto contient order
+                                    menu.getOrder()
                             ))
                             .collect(Collectors.toCollection(LinkedHashSet::new));
 
@@ -84,6 +83,7 @@ public class AuthController {
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhone(),
+                user.getPatientId(),   // <-- ajouter ici
                 roleDtos
         );
     }
@@ -132,6 +132,7 @@ public class AuthController {
                             user.getLastName(),
                             user.getEmail(),
                             user.getPhone(),
+                            user.getPatientId(),   // <-- ajouté ici
                             roleDtos
                     );
                 })
@@ -139,6 +140,7 @@ public class AuthController {
 
         return ResponseEntity.ok(userDtos);
     }
+
 
 
     @PutMapping("/users/{id}")
@@ -195,11 +197,13 @@ public class AuthController {
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhone(),
+                user.getPatientId(),   // <-- ajouté ici
                 roleDtos
         );
 
         return ResponseEntity.ok(responseDto);
     }
+
     @DeleteMapping("/users/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
