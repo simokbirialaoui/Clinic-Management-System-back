@@ -83,10 +83,12 @@ public class AuthController {
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getPatientId(),   // <-- ajouter ici
+                user.getPatientId(),   // existant
+                user.getDoctorId(),    // nouveau champ à récupérer
                 roleDtos
         );
     }
+
 
 
 
@@ -101,6 +103,7 @@ public class AuthController {
         String email = service.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Mot de passe réinitialisé avec succès : " + email);
     }
+
     @GetMapping("/users")
     public ResponseEntity<List<UserResponseDto>> getAllUsers() {
         List<UserCredential> users = userCredentialRepository.findByDeletedFalse();
@@ -132,7 +135,8 @@ public class AuthController {
                             user.getLastName(),
                             user.getEmail(),
                             user.getPhone(),
-                            user.getPatientId(),   // <-- ajouté ici
+                            user.getPatientId(),   // déjà présent
+                            user.getDoctorId(),    // nouveau champ ajouté ici
                             roleDtos
                     );
                 })
@@ -162,6 +166,7 @@ public class AuthController {
         userCredentialRepository.save(existingUser);
         return ResponseEntity.ok("Utilisateur mis à jour avec succès");
     }
+
     @GetMapping("/users/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
@@ -197,7 +202,8 @@ public class AuthController {
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getPatientId(),   // <-- ajouté ici
+                user.getPatientId(),    // <-- déjà présent
+                user.getDoctorId(),     // <-- ajout ici
                 roleDtos
         );
 

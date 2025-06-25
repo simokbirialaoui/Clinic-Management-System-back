@@ -1,5 +1,7 @@
 package com.javatechie.service;
 
+import com.javatechie.dto.DoctorRequest;
+import com.javatechie.dto.DoctorResponse;
 import com.javatechie.dto.PatientResponse;
 import com.javatechie.entity.UserCredential;
 import com.javatechie.repository.UserCredentialRepository;
@@ -109,29 +111,44 @@ public class AuthService {
 
 
     private void createDoctorInDoctorMs(UserCredential user) {
-        String url = "http://localhost:8081/api/doctors";  // URL de ton microservice doctor-ms
+        String url = "http://localhost:8081/api/doctors";  // URL du microservice doctor-ms
 
+        // Préparation de la requête avec les données du médecin à créer
         Map<String, Object> request = new HashMap<>();
         request.put("firstName", user.getFirstName());
         request.put("lastName", user.getLastName());
         request.put("email", user.getEmail());
         request.put("phone", user.getPhone());
-        // Ajoute d'autres champs spécifiques aux médecins si besoin
+        // Ajoute d'autres champs si nécessaire, par ex. specialization, etc.
 
+        // Configuration des headers, notamment pour envoyer un token JWT technique
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(systemTokenProvider.getSystemToken());  // Token technique pour appel inter-service
+        headers.setBearerAuth(systemTokenProvider.getSystemToken());
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-            System.out.println("✅ Doctor créé dans doctor-ms : " + response.getBody());
+            // Appel POST vers doctor-ms avec récupération d'un DoctorDto (qui contient l'ID)
+            ResponseEntity<DoctorResponse> response = restTemplate.postForEntity(url, entity, DoctorResponse.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                Long doctorId = response.getBody().getId();
+                System.out.println("✅ Doctor créé dans doctor-ms : ID = " + doctorId);
+
+                // Sauvegarde de doctorId dans l'utilisateur local
+                user.setDoctorId(doctorId);
+                repository.save(user);
+            } else {
+                throw new RuntimeException("Création doctor a échoué, réponse inattendue : " + response.getStatusCode());
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("❌ Erreur création doctor dans doctor-ms: " + e.getMessage());
+            throw new RuntimeException("❌ Erreur création doctor dans doctor-ms : " + e.getMessage());
         }
     }
+
 
     public String generateToken(String email) {
         UserCredential credential = repository.findByEmail(email)

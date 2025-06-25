@@ -24,7 +24,7 @@ public class UserCredential {
     @Column(name = "deleted")
     private Boolean deleted = false;
     private Long patientId;
-
+    private Long doctorId;
 
     @ManyToMany(fetch = FetchType.EAGER)  // Chargement immédiat des roles avec l'utilisateur
     @JoinTable(
