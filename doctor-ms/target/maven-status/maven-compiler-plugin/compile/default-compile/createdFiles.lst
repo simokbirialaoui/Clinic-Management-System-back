@@ -1,5 +1,0 @@
-com\clinic\doctorms\controllers\DoctorController.class
-com\clinic\doctorms\repositories\RepositoryDoctor.class
-com\clinic\doctorms\entities\Doctor$DoctorBuilder.class
-com\clinic\doctorms\DoctorMsApplication.class
-com\clinic\doctorms\entities\Doctor.class
