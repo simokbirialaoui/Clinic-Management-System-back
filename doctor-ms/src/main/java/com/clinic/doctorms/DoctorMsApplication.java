@@ -1,15 +1,8 @@
 package com.clinic.doctorms;
 
-import com.clinic.doctorms.entities.Doctor;
-import com.clinic.doctorms.repositories.RepositoryDoctor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.List;
 
 @SpringBootApplication
 public class DoctorMsApplication {
