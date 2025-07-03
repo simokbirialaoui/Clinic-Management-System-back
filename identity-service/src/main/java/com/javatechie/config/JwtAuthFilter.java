@@ -31,7 +31,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
         // Ne pas filtrer les endpoints publics
-        if (path.equals("/auth/token") || path.equals("/auth/register") || path.equals("/auth/validate")) {
+        if (path.equals("/auth/token") || path.equals("/auth/register") || path.equals("/auth/validate" )|| path.equals("/auth/menus") ||  path.equals("/auth/forgot-password") ||
+                path.equals("/auth/reset-password")  ) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,9 +48,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtService.isTokenValid(token, userDetails)) {
+            if (jwtService.isTokenValid(token, username)) {
+                var roles = jwtService.extractRoles(token);
+                var authorities = roles.stream()
+                        .map(role -> new org.springframework.security.core.authority.SimpleGrantedAuthority(role))
+                        .toList();
+
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(username, null, authorities);
+
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }

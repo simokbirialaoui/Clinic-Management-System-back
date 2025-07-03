@@ -1,27 +1,32 @@
 package com.javatechie.config;
 
+import com.javatechie.entity.Role;
 import com.javatechie.entity.UserCredential;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
-    private String username;
+    private String email;
     private String password;
+    private Set<Role> roles;
 
     public CustomUserDetails(UserCredential userCredential) {
-        this.username = userCredential.getName();
+        this.email = userCredential.getEmail();
         this.password = userCredential.getPassword();
+        this.roles = userCredential.getRoles();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Retourne un rôle USER par défaut
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .toList();
     }
 
     @Override
@@ -31,7 +36,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
