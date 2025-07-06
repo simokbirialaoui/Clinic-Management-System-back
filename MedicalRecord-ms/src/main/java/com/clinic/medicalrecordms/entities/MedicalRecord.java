@@ -20,8 +20,8 @@ public class MedicalRecord {
     private String notes;
     private LocalDate date;
 
-    @OneToMany(mappedBy = "medicalRecord", fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LabResult> labResults;
+//    @OneToMany(mappedBy = "medicalRecord", fetch = FetchType.EAGER,cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<LabResult> labResults;
 
     private Long patientId;
     private Long doctorId;

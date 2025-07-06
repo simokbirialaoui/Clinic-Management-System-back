@@ -19,5 +19,5 @@ public class LabResultResponseDTO {
     private String testName;
     private String result;
     private LocalDate testDate;
-    private MedicalRecordResponseDTO medicalRecordResponseDTO;
+//    private MedicalRecordResponseDTO medicalRecordResponseDTO;
 }

@@ -15,7 +15,7 @@ public class LabResultMapper {
 
         LabResultResponseDTO labResultResponseDTO = new LabResultResponseDTO();
         BeanUtils.copyProperties(labResult, labResultResponseDTO);
-        labResultResponseDTO.setMedicalRecordResponseDTO(medicalRecordMapper.toResponseDTO(labResult.getMedicalRecord()));
+       // labResultResponseDTO.setMedicalRecordResponseDTO(medicalRecordMapper.toResponseDTO(labResult.getMedicalRecord()));
         return  labResultResponseDTO;
     }
 }

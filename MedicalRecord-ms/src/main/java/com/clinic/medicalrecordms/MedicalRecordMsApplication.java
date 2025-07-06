@@ -48,33 +48,18 @@ public class MedicalRecordMsApplication {
                 );
             });
             List<MedicalRecord> medicalRecords = medicalRecordRepository.findAll();
-            medicalRecords.forEach(medicalRecord -> {
-                labResultRepository.save(
-                        LabResult.builder()
-                                .testName("Blood Test")
-                                .result("Normal")
-                                .testDate(LocalDate.now())
-                                .medicalRecord(medicalRecord)
-                                .build()
-                );
-            });
+//            medicalRecords.forEach(medicalRecord -> {
+//                labResultRepository.save(
+//                        LabResult.builder()
+//                                .testName("Blood Test")
+//                                .result("Normal")
+//                                .testDate(LocalDate.now())
+//                                .medicalRecord(medicalRecord)
+//                                .build()
+//                );
+//            });
 
-//            medicalRecordRepository.save(
-//                    MedicalRecord.builder()
-//                            .date(LocalDate.now())
-//                            .diagnosis("Headache")
-//                            .prescription("Pain relievers")
-//                            .notes("Patient advised to rest.")
-//                            .build()
-//            );
-//            medicalRecordRepository.save(
-//                    MedicalRecord.builder()
-//                            .date(LocalDate.now())
-//                            .diagnosis("Back pain")
-//                            .prescription("Physical therapy")
-//                            .notes("Patient to follow up in 2 weeks.")
-//                            .build()
-//            );
+
             medicalRecordRepository.findAll().forEach(m->{
                 System.out.println("====================");
                 System.out.println(m.getId());
@@ -82,9 +67,9 @@ public class MedicalRecordMsApplication {
                 System.out.println(m.getDiagnosis());
                 System.out.println(m.getPrescription());
                 System.out.println(m.getNotes());
-                m.getLabResults().forEach(labResult -> {
-                    System.out.println("Lab Result: " + labResult.getTestName() + " - " + labResult.getResult());
-                });
+//                m.getLabResults().forEach(labResult -> {
+//                    System.out.println("Lab Result: " + labResult.getTestName() + " - " + labResult.getResult());
+//                });
             });
         };
     }
