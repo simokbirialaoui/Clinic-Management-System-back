@@ -20,7 +20,7 @@ public class LabResult {
     private String result;
     private LocalDate testDate;
 
-    @ManyToOne
-    private MedicalRecord medicalRecord;
+//    @ManyToOne
+//    private MedicalRecord medicalRecord;
 
 }

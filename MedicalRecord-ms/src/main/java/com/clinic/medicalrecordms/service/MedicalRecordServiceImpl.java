@@ -98,7 +98,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         record.setPatient(null);
 
         // Supprimer les labResults s'ils dépendent de record
-        record.getLabResults().clear();
+       // record.getLabResults().clear();
 
         medicalRecordRepository.delete(record);
     }
