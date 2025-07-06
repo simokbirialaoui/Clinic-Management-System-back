@@ -40,6 +40,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 .patient(patientRestClient.getPatientById(medicalRecordRequestDTO.getPatientId()))
                 .build();
 
+
         MedicalRecord savedMedicalRecord1 = medicalRecordRepository.save(medicalRecord);
 
         MedicalRecordResponseDTO medicalRecordResponseDTO = medicalRecordMapper.toResponseDTO(savedMedicalRecord1);
@@ -89,10 +90,17 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
     @Override
     public void deleteMedicalRecord(Long id) {
-        if (!medicalRecordRepository.existsById(id)) {
-            throw new RuntimeException("Medical record not found with id: " + id);
-        }
-        medicalRecordRepository.deleteById(id);
+        MedicalRecord record = medicalRecordRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Not found"));
+
+        // Sécurité : nettoyer les champs @Transient
+        record.setDoctor(null);
+        record.setPatient(null);
+
+        // Supprimer les labResults s'ils dépendent de record
+        record.getLabResults().clear();
+
+        medicalRecordRepository.delete(record);
     }
 
 }
