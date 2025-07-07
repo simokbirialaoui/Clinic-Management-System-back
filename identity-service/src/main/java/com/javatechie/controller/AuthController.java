@@ -2,7 +2,9 @@ package com.javatechie.controller;
 
 import com.javatechie.dto.*;
 import com.javatechie.entity.MenuItem;
+import com.javatechie.entity.Role;
 import com.javatechie.entity.UserCredential;
+import com.javatechie.repository.RoleRepository;
 import com.javatechie.repository.UserCredentialRepository;
 import com.javatechie.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,8 @@ import java.util.stream.Collectors;
 public class AuthController {
     @Autowired
     private AuthService service;
-
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -148,24 +151,29 @@ public class AuthController {
 
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserCredential updatedUser) {
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO updatedUserDto) {
         Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
         if (optionalUser.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
         UserCredential existingUser = optionalUser.get();
-        existingUser.setFirstName(updatedUser.getFirstName());
-        existingUser.setLastName(updatedUser.getLastName());
-        existingUser.setEmail(updatedUser.getEmail());
-        existingUser.setPhone(updatedUser.getPhone());
+        existingUser.setFirstName(updatedUserDto.getFirstName());
+        existingUser.setLastName(updatedUserDto.getLastName());
+        existingUser.setEmail(updatedUserDto.getEmail());
+        existingUser.setPhone(updatedUserDto.getPhone());
 
-        // Si tu veux aussi mettre à jour les rôles :
-        existingUser.setRoles(updatedUser.getRoles());
+        // Mettre à jour les rôles si besoin
+        if (updatedUserDto.getRoleIds() != null && !updatedUserDto.getRoleIds().isEmpty()) {
+            Set<Role> roles = roleRepository.findAllById(updatedUserDto.getRoleIds())
+                    .stream().collect(Collectors.toSet());
+            existingUser.setRoles(roles);
+        }
 
         userCredentialRepository.save(existingUser);
         return ResponseEntity.ok("Utilisateur mis à jour avec succès");
     }
+
 
     @GetMapping("/users/{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
@@ -222,6 +230,26 @@ public class AuthController {
         userCredentialRepository.save(user);
 
         return ResponseEntity.ok("Utilisateur marqué comme supprimé");
+    }
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request, Principal principal) {
+        String email = principal.getName();
+        UserCredential user = userCredentialRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Vérifie l'ancien mot de passe
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("Ancien mot de passe incorrect");
+        }
+
+        // Met à jour avec le nouveau mot de passe encodé
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userCredentialRepository.save(user);
+
+        return ResponseEntity.ok("Mot de passe mis à jour avec succès");
     }
 
 }
