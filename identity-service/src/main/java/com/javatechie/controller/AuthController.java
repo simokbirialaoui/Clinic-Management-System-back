@@ -30,9 +30,21 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public String addNewUser(@RequestBody UserCredential user) {
-        return service.saveUser(user);
+    public ResponseEntity<Map<String, Object>> addNewUser(@RequestBody UserCredential user) {
+        String result = service.saveUser(user);
+
+        Map<String, Object> response = new HashMap<>();
+        if ("Email déjà utilisé".equals(result)) {
+            response.put("success", false);
+            response.put("message", result);
+            return ResponseEntity.status(409).body(response); // ⚠️ 409 Conflict pour doublon
+        }
+
+        response.put("success", true);
+        response.put("message", result);
+        return ResponseEntity.status(201).body(response); // 201 Created
     }
+
 
     @PostMapping("/token")
     public String getToken(@RequestBody AuthRequest authRequest) {
