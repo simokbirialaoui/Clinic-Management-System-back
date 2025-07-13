@@ -49,10 +49,17 @@ public class DoctorController {
             doctor.setEmail(updatedDoctorDto.getEmail());
             doctor.setPhone(updatedDoctorDto.getPhone());
             doctor.setSpecialization(updatedDoctorDto.getSpecialization());
+
+            // ✅ Ajout des champs manquants
+            doctor.setAvailableDays(updatedDoctorDto.getAvailableDays());
+            doctor.setStartTime(updatedDoctorDto.getStartTime());
+            doctor.setEndTime(updatedDoctorDto.getEndTime());
+
             Doctor updatedDoctor = repository.save(doctor);
             return ResponseEntity.ok(doctorMapper.fromDoctor(updatedDoctor));
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDoctor(@PathVariable Long id) {
