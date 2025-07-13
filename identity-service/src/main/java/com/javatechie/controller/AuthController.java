@@ -164,26 +164,11 @@ public class AuthController {
 
     @PutMapping("/users/{id}")
     public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO updatedUserDto) {
-        Optional<UserCredential> optionalUser = userCredentialRepository.findById(id);
-        if (optionalUser.isEmpty()) {
+        String result = service.updateUser(id, updatedUserDto);
+        if (result.equals("Utilisateur introuvable")) {
             return ResponseEntity.notFound().build();
         }
-
-        UserCredential existingUser = optionalUser.get();
-        existingUser.setFirstName(updatedUserDto.getFirstName());
-        existingUser.setLastName(updatedUserDto.getLastName());
-        existingUser.setEmail(updatedUserDto.getEmail());
-        existingUser.setPhone(updatedUserDto.getPhone());
-
-        // Mettre à jour les rôles si besoin
-        if (updatedUserDto.getRoleIds() != null && !updatedUserDto.getRoleIds().isEmpty()) {
-            Set<Role> roles = roleRepository.findAllById(updatedUserDto.getRoleIds())
-                    .stream().collect(Collectors.toSet());
-            existingUser.setRoles(roles);
-        }
-
-        userCredentialRepository.save(existingUser);
-        return ResponseEntity.ok("Utilisateur mis à jour avec succès");
+        return ResponseEntity.ok(result);
     }
 
 

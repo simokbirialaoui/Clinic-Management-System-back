@@ -3,7 +3,10 @@ package com.javatechie.service;
 import com.javatechie.dto.DoctorRequest;
 import com.javatechie.dto.DoctorResponse;
 import com.javatechie.dto.PatientResponse;
+import com.javatechie.dto.UserUpdateDTO;
+import com.javatechie.entity.Role;
 import com.javatechie.entity.UserCredential;
+import com.javatechie.repository.RoleRepository;
 import com.javatechie.repository.UserCredentialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -21,7 +24,10 @@ import java.util.stream.Collectors;
 public class AuthService {
 
     @Autowired
-    private UserCredentialRepository repository;
+    private UserCredentialRepository userCredentialRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -38,43 +44,48 @@ public class AuthService {
     @Autowired
     private SystemTokenProvider systemTokenProvider;
 
+    @Autowired
+    private DoctorServiceClient doctorServiceClient;
+    @Autowired
+    private PatientServiceClient patientServiceClient;
+
     public void forgotPassword(String email) {
-        UserCredential user = repository.findByEmail(email)
+        UserCredential user = userCredentialRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
         String token = UUID.randomUUID().toString();
         user.setResetToken(token);
-        repository.save(user);
+        userCredentialRepository.save(user);
 
         mailService.sendResetToken(email, token);
     }
 
     public String resetPassword(String token, String newPassword) {
-        UserCredential user = repository.findByResetToken(token)
+        UserCredential user = userCredentialRepository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("Token invalide ou expiré"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setResetToken(null);
-        repository.save(user);
+        userCredentialRepository.save(user);
         return user.getEmail();
     }
 
     public String saveUser(UserCredential credential) {
         credential.setPassword(passwordEncoder.encode(credential.getPassword()));
-        repository.save(credential);
+        userCredentialRepository.save(credential);
 
         boolean isPatient = credential.getRoles().stream()
                 .anyMatch(role -> "PATIENT".equalsIgnoreCase(role.getName()));
-
         if (isPatient) {
             createPatientInPatientMs(credential);
         }
+
         boolean isDoctor = credential.getRoles().stream()
                 .anyMatch(role -> "DOCTOR".equalsIgnoreCase(role.getName()));
-
         if (isDoctor) {
             createDoctorInDoctorMs(credential);
         }
+
         return "user added to the system";
     }
 
@@ -99,9 +110,8 @@ public class AuthService {
 
             System.out.println("✅ Patient créé dans patient-ms : ID = " + patientId);
 
-            // Sauvegarder patientId dans l'utilisateur
             user.setPatientId(patientId);
-            repository.save(user);
+            userCredentialRepository.save(user);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,19 +119,15 @@ public class AuthService {
         }
     }
 
-
     private void createDoctorInDoctorMs(UserCredential user) {
-        String url = "http://localhost:8081/api/doctors";  // URL du microservice doctor-ms
+        String url = "http://localhost:8081/api/doctors";
 
-        // Préparation de la requête avec les données du médecin à créer
         Map<String, Object> request = new HashMap<>();
         request.put("firstName", user.getFirstName());
         request.put("lastName", user.getLastName());
         request.put("email", user.getEmail());
         request.put("phone", user.getPhone());
-        // Ajoute d'autres champs si nécessaire, par ex. specialization, etc.
 
-        // Configuration des headers, notamment pour envoyer un token JWT technique
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(systemTokenProvider.getSystemToken());
@@ -129,16 +135,14 @@ public class AuthService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
         try {
-            // Appel POST vers doctor-ms avec récupération d'un DoctorDto (qui contient l'ID)
             ResponseEntity<DoctorResponse> response = restTemplate.postForEntity(url, entity, DoctorResponse.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Long doctorId = response.getBody().getId();
                 System.out.println("✅ Doctor créé dans doctor-ms : ID = " + doctorId);
 
-                // Sauvegarde de doctorId dans l'utilisateur local
                 user.setDoctorId(doctorId);
-                repository.save(user);
+                userCredentialRepository.save(user);
             } else {
                 throw new RuntimeException("Création doctor a échoué, réponse inattendue : " + response.getStatusCode());
             }
@@ -149,9 +153,39 @@ public class AuthService {
         }
     }
 
+    public String updateUser(Long id, UserUpdateDTO dto) {
+        Optional<UserCredential> optional = userCredentialRepository.findById(id);
+        if (optional.isEmpty()) return "Utilisateur introuvable";
+
+        UserCredential user = optional.get();
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+
+        if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+            Set<Role> roles = roleRepository.findAllById(dto.getRoleIds())
+                    .stream().collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+
+        userCredentialRepository.save(user);
+
+        // ✅ Mise à jour doctor si lié
+        if (user.getDoctorId() != null) {
+            doctorServiceClient.updateDoctor(user.getDoctorId(), user);
+        }
+
+        // 👨‍💼 Mise à jour patient si lié
+        if (user.getPatientId() != null) {
+            patientServiceClient.updatePatient(user.getPatientId(), user);
+        }
+
+        return "Utilisateur mis à jour avec succès";
+    }
 
     public String generateToken(String email) {
-        UserCredential credential = repository.findByEmail(email)
+        UserCredential credential = userCredentialRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         UserDetails userDetails = mapToUserDetails(credential);
         return jwtService.generateToken(userDetails);

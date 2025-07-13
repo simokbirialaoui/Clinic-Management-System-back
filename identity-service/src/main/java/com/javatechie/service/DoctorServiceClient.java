@@ -35,4 +35,20 @@ public class DoctorServiceClient {
 
         return response.getBody();
     }
+
+    public void updateDoctor(Long doctorId, UserCredential user) {
+        DoctorRequest doctor = new DoctorRequest();
+        doctor.setFirstName(user.getFirstName());
+        doctor.setLastName(user.getLastName());
+        doctor.setEmail(user.getEmail());
+        doctor.setPhone(user.getPhone());
+        doctor.setSpecialization("Généraliste"); // à adapter
+        doctor.setAvailableDays(List.of());
+        doctor.setStartTime(null);
+        doctor.setEndTime(null);
+
+        String url = "http://localhost:8081/api/doctors/" + doctorId; // ou via Eureka
+        restTemplate.put(url, doctor);
+    }
+
 }
