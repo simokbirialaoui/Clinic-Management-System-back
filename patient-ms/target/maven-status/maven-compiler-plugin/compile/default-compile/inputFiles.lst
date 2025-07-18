@@ -1,5 +1,9 @@
-C:\Users\MK ALAOUI - Admin\Desktop\study\pfe\Clinic Management System back\patient-ms\src\main\java\com\clinic\patientms\controllers\PatientController.java
-C:\Users\MK ALAOUI - Admin\Desktop\study\pfe\Clinic Management System back\patient-ms\src\main\java\com\clinic\patientms\entities\Patient.java
-C:\Users\MK ALAOUI - Admin\Desktop\study\pfe\Clinic Management System back\patient-ms\src\main\java\com\clinic\patientms\enums\Gender.java
-C:\Users\MK ALAOUI - Admin\Desktop\study\pfe\Clinic Management System back\patient-ms\src\main\java\com\clinic\patientms\PatientMsApplication.java
-C:\Users\MK ALAOUI - Admin\Desktop\study\pfe\Clinic Management System back\patient-ms\src\main\java\com\clinic\patientms\repositories\RepositoryPatient.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\controllers\PatientController.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\dtos\PatientCreatedEvent.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\dtos\PatientDTO.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\entities\Patient.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\enums\Gender.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\kafka\PatientProducer.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\mappers\PatientMapperImpl.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\PatientMsApplication.java
+C:\partage\clnc\Clinic-Management-System-back\patient-ms\src\main\java\com\clinic\patientms\repositories\RepositoryPatient.java

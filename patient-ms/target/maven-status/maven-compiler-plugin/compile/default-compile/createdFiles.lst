@@ -1,6 +1,11 @@
+com\clinic\patientms\dtos\PatientDTO.class
 com\clinic\patientms\PatientMsApplication.class
 com\clinic\patientms\repositories\RepositoryPatient.class
 com\clinic\patientms\entities\Patient.class
+com\clinic\patientms\dtos\PatientCreatedEvent.class
 com\clinic\patientms\entities\Patient$PatientBuilder.class
+com\clinic\patientms\dtos\PatientDTO$PatientDTOBuilder.class
 com\clinic\patientms\enums\Gender.class
+com\clinic\patientms\kafka\PatientProducer.class
+com\clinic\patientms\mappers\PatientMapperImpl.class
 com\clinic\patientms\controllers\PatientController.class
