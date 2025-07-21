@@ -20,7 +20,8 @@ services:
 
   doctor-ms:
     build:
-      context: ./doctor-ms
+      context: .
+      dockerfile: doctor-ms/Dockerfile
     container_name: doctor-ms
     depends_on:
       - mysql
