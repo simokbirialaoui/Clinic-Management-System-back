@@ -1,4 +1,20 @@
+version: '3.8'
+
 services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clinicIdentity
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql             # ✅ Volume nommé pour persistance des données
+      - ./identity-service/clinicIdentity.sql:/docker-entrypoint-initdb.d/clinicIdentity.sql
+    networks:
+      - clinic-network
+
   discovery-service:
     build: ./discovery-service
     container_name: discovery-service
@@ -7,34 +23,24 @@ services:
     networks:
       - clinic-network
 
-  mysql:
-    image: mysql:8
-    container_name: mysql
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: doctor-ms-db
-    networks:
-      - clinic-network
-
-  doctor-ms:
+  identity-service:
     build:
       context: .
-      dockerfile: doctor-ms/Dockerfile
-    container_name: doctor-ms
+      dockerfile: identity-service/Dockerfile
+    container_name: identity-service
+    ports:
+      - "9898:9898"
     depends_on:
       - mysql
       - discovery-service
-    ports:
-      - "8081:8081"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - MYSQL_HOST=mysql
-      - MYSQL_PORT=3306
+      SPRING_PROFILES_ACTIVE: docker
     networks:
       - clinic-network
 
 networks:
   clinic-network:
     driver: bridge
+
+volumes:
+  mysql-data:    # ✅ Déclaration du volume nommé

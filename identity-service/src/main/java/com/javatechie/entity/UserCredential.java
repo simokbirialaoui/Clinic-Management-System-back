@@ -10,6 +10,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "usercredential")
 public class UserCredential {
 
     @Id

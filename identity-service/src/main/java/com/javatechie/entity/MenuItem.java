@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "roles")  // Évite les problèmes de boucle dans toString()
+@Table(name = "menuitem")
 public class MenuItem {
 
     @Id

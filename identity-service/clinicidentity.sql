@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 18 juin 2025 à 17:49
+-- Généré le : ven. 11 juil. 2025 à 18:20
 -- Version du serveur :  10.4.18-MariaDB
 -- Version de PHP : 7.3.27
 
@@ -44,8 +44,7 @@ INSERT INTO `menuitem` (`id`, `icon`, `path`, `title`, `display_order`) VALUES
 (2, 'flaticon-calendar', '/appointments', 'appointments', 2),
 (3, 'flaticon-user-1', '/patients', 'patients', 3),
 (4, 'flaticon-user', '/doctors', 'doctors', 4),
-(5, 'flaticon-envelope', '/messages', 'messages', 5),
-(6, 'flaticon-setting', '/settings', 'settings', 6);
+(7, 'flaticon-user-1', '/users', 'users', 7);
 
 -- --------------------------------------------------------
 
@@ -69,6 +68,7 @@ INSERT INTO `menu_roles` (`role_id`, `menu_id`) VALUES
 (1, 4),
 (1, 5),
 (1, 6),
+(1, 7),
 (2, 1),
 (2, 2),
 (2, 3),
@@ -118,18 +118,23 @@ CREATE TABLE `usercredential` (
   `firstName` varchar(255) DEFAULT NULL,
   `lastName` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `phone` varchar(255) DEFAULT NULL
+  `phone` varchar(255) DEFAULT NULL,
+  `resetToken` varchar(255) DEFAULT NULL,
+  `deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `patientId` bigint(20) DEFAULT NULL,
+  `doctorId` bigint(20) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 --
 -- Déchargement des données de la table `usercredential`
 --
 
-INSERT INTO `usercredential` (`id`, `email`, `firstName`, `lastName`, `password`, `phone`) VALUES
-(1, 'hanane@gmail.com', 'Hanane', 'Lahssini', '$2a$10$dX9ZrwjDSBJ6LTKfTuxFbezERGxk5oupTdwZRFN1tYbnCPioWlney', '0600000001'),
-(2, 'zaineb@gmail.com', 'Zaineb', 'El Amrani', '$2a$10$NmT2IDvFMoAxG0rnY5UdDuo0WuMQ5wyjiw7bWshkyCiBm6FdYOlIa', '0600000002'),
-(3, 'mohammed@gmail.com', 'Mohammed', 'alaoui', '$2a$10$HPOOXuX1gWgeIF00ZLq.lOI2usS0.PtGWKKx4Agz97miVee1HvfAC', '0600000003'),
-(4, 'janat@gmail.com', 'janat', 'lahssini', '$2a$10$MilPnneimt6euRn2grJz6.3Uly.3Z5muX7OZVNb4HvItoh43mjksa', '0612457896');
+INSERT INTO `usercredential` (`id`, `email`, `firstName`, `lastName`, `password`, `phone`, `resetToken`, `deleted`, `patientId`, `doctorId`) VALUES
+(1, 'janajonita@gmail.com', 'Hanane', 'Lahssini', '$2a$10$PNKFbdJrLFPfTFTj.BR8kugOdfabhTssKpBR/SBWv2aMlLnxAnO6q', '0623569674', NULL, 0, NULL, NULL),
+(2, 'system@internal.local', 'System', 'Internal', '$2a$10$AbcdEFGHijklMNOPqrstuvHASHEDPWD', '0000000000', NULL, 1, NULL, NULL),
+(3, 'janat@gmail.com', 'janat', 'janat', '$2a$10$CKh1IEi9W5Q0o7FnkUee4u59aY/DP/JH.B1QClhMEHtYawhR/uwoK', '0612457896', NULL, 0, NULL, 1),
+(4, 'sara@gmail.com', 'sara', 'sara', '$2a$10$wIu.TwZERj9L9xSuQu5tlO.x/ND.lT9JaYvw8M.qv2P9/Vum2ZjyC', '0612457896', NULL, 0, 21, NULL),
+(5, 'soufiane@gmail.com', 'soufiane', 'sajid', '$2a$10$mzQ1JEVYJtsGe0El9/v8quJ/CUev.rDtqKvLKQSyMo9OkuuvNBtUe', '0612457896', NULL, 0, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -148,9 +153,9 @@ CREATE TABLE `user_roles` (
 
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 (1, 1),
-(2, 2),
-(3, 3),
-(4, 3);
+(3, 2),
+(4, 3),
+(5, 2);
 
 --
 -- Index pour les tables déchargées
@@ -203,7 +208,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT pour la table `menuitem`
 --
 ALTER TABLE `menuitem`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT pour la table `role`
@@ -215,7 +220,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT pour la table `usercredential`
 --
 ALTER TABLE `usercredential`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

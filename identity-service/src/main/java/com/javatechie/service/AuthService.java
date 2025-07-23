@@ -9,6 +9,7 @@ import com.javatechie.entity.UserCredential;
 import com.javatechie.repository.RoleRepository;
 import com.javatechie.repository.UserCredentialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -48,6 +49,12 @@ public class AuthService {
     private DoctorServiceClient doctorServiceClient;
     @Autowired
     private PatientServiceClient patientServiceClient;
+
+    @Value("${doctor.service.base-url}")
+    private String doctorServiceBaseUrl;
+
+    @Value("${patient.service.base-url}")
+    private String patientServiceBaseUrl;
 
     public void forgotPassword(String email) {
         UserCredential user = userCredentialRepository.findByEmail(email)
@@ -90,7 +97,7 @@ public class AuthService {
     }
 
     private void createPatientInPatientMs(UserCredential user) {
-        String url = "http://localhost:8082/api/patients";
+        String url = patientServiceBaseUrl + "/api/patients";
 
         Map<String, Object> request = new HashMap<>();
         request.put("firstName", user.getFirstName());
@@ -120,7 +127,7 @@ public class AuthService {
     }
 
     private void createDoctorInDoctorMs(UserCredential user) {
-        String url = "http://localhost:8081/api/doctors";
+        String url = doctorServiceBaseUrl + "/api/doctors";
 
         Map<String, Object> request = new HashMap<>();
         request.put("firstName", user.getFirstName());

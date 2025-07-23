@@ -1,0 +1,50 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  application:
+    name: identity-service
+
+  datasource:
+    url: jdbc:mysql://mysql:3306/clinicIdentity?createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: hananelahssini22@gmail.com
+    password: xjucvhfvnlnypflc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 9898
+
+doctor:
+  service:
+    base-url: http://doctor-ms:8081
+
+patient:
+  service:
+    base-url: http://patient-ms:8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka

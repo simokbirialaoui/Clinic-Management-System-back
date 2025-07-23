@@ -78,11 +78,18 @@ public class AuthConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200")
+                        .allowedOrigins(
+                                "http://localhost:4200",
+                                "http://host.docker.internal:4200" // 👉 nécessaire en mode Docker
+                        )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
+                        .allowedHeaders("Authorization", "Content-Type", "X-Requested-With", "Access-Control-Allow-Origin")
+                        .exposedHeaders("Authorization")
                         .allowCredentials(true);
             }
         };
     }
+
+
+
 }
