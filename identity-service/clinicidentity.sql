@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.1.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 11 juil. 2025 à 18:20
--- Version du serveur :  10.4.18-MariaDB
--- Version de PHP : 7.3.27
+-- Généré le : mer. 23 juil. 2025 à 18:12
+-- Version du serveur : 10.4.32-MariaDB
+-- Version de PHP : 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -33,7 +33,7 @@ CREATE TABLE `menuitem` (
   `path` varchar(255) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `display_order` int(11) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `menuitem`
@@ -55,7 +55,7 @@ INSERT INTO `menuitem` (`id`, `icon`, `path`, `title`, `display_order`) VALUES
 CREATE TABLE `menu_roles` (
   `role_id` int(11) NOT NULL,
   `menu_id` bigint(20) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `menu_roles`
@@ -84,7 +84,7 @@ INSERT INTO `menu_roles` (`role_id`, `menu_id`) VALUES
 CREATE TABLE `role` (
   `id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `role`
@@ -104,7 +104,7 @@ INSERT INTO `role` (`id`, `name`) VALUES
 CREATE TABLE `role_routes` (
   `role_id` int(11) NOT NULL,
   `route_id` bigint(20) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -123,7 +123,7 @@ CREATE TABLE `usercredential` (
   `deleted` tinyint(1) NOT NULL DEFAULT 0,
   `patientId` bigint(20) DEFAULT NULL,
   `doctorId` bigint(20) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `usercredential`
@@ -131,10 +131,9 @@ CREATE TABLE `usercredential` (
 
 INSERT INTO `usercredential` (`id`, `email`, `firstName`, `lastName`, `password`, `phone`, `resetToken`, `deleted`, `patientId`, `doctorId`) VALUES
 (1, 'janajonita@gmail.com', 'Hanane', 'Lahssini', '$2a$10$PNKFbdJrLFPfTFTj.BR8kugOdfabhTssKpBR/SBWv2aMlLnxAnO6q', '0623569674', NULL, 0, NULL, NULL),
-(2, 'system@internal.local', 'System', 'Internal', '$2a$10$AbcdEFGHijklMNOPqrstuvHASHEDPWD', '0000000000', NULL, 1, NULL, NULL),
-(3, 'janat@gmail.com', 'janat', 'janat', '$2a$10$CKh1IEi9W5Q0o7FnkUee4u59aY/DP/JH.B1QClhMEHtYawhR/uwoK', '0612457896', NULL, 0, NULL, 1),
-(4, 'sara@gmail.com', 'sara', 'sara', '$2a$10$wIu.TwZERj9L9xSuQu5tlO.x/ND.lT9JaYvw8M.qv2P9/Vum2ZjyC', '0612457896', NULL, 0, 21, NULL),
-(5, 'soufiane@gmail.com', 'soufiane', 'sajid', '$2a$10$mzQ1JEVYJtsGe0El9/v8quJ/CUev.rDtqKvLKQSyMo9OkuuvNBtUe', '0612457896', NULL, 0, NULL, 3);
+(2, 'system@clinic.com', 'System', 'Internal', '$2a$10$AbcdEFGHijklMNOPqrstuvHASHEDPWD', '0000000000', NULL, 1, NULL, NULL),
+(3, 'janat@gmail.com', 'janat', 'lahssini', '$2a$10$.tO3hYTc.9OXxCvmlOmINeYxIZyQ.424CkbBjJqXIm9aM0Tr2nyhe', '0612459641', NULL, 0, NULL, 1),
+(4, 'mohammed@gmail.com', 'mohammed', 'kbiri', '$2a$10$2j7XYv06RK.zoVY.H0a3rOnHh2couwBqLqW5Zg/kTyALYD57R.AK2', '0612457896', NULL, 0, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -145,7 +144,7 @@ INSERT INTO `usercredential` (`id`, `email`, `firstName`, `lastName`, `password`
 CREATE TABLE `user_roles` (
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `user_roles`
@@ -153,9 +152,8 @@ CREATE TABLE `user_roles` (
 
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 (1, 1),
-(3, 2),
-(4, 3),
-(5, 2);
+(4, 2),
+(4, 3);
 
 --
 -- Index pour les tables déchargées
@@ -220,7 +218,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT pour la table `usercredential`
 --
 ALTER TABLE `usercredential`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
