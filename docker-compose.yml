@@ -7,12 +7,13 @@ services:
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: clinicIdentity
     ports:
       - "3307:3307"
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./identity-service/clinicIdentity.sql:/docker-entrypoint-initdb.d/clinicIdentity.sql
+      - ./identity-service/clinicIdentity.sql:/docker-entrypoint-initdb.d/1_clinicIdentity.sql
+      - ./doctor-ms/doctor-ms-db.sql:/docker-entrypoint-initdb.d/2_doctor-ms-db.sql
+      - ./patient-ms/patient-ms-db.sql:/docker-entrypoint-initdb.d/3_patient-ms-db.sql
     networks:
       - clinic-network
 

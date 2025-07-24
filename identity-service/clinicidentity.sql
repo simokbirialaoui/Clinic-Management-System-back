@@ -1,9 +1,12 @@
+CREATE DATABASE IF NOT EXISTS `clinicIdentity`;
+USE `clinicIdentity`;
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 23 juil. 2025 à 18:12
+-- Généré le : jeu. 24 juil. 2025 à 12:26
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.0.30
 
@@ -44,7 +47,9 @@ INSERT INTO `menuitem` (`id`, `icon`, `path`, `title`, `display_order`) VALUES
 (2, 'flaticon-calendar', '/appointments', 'appointments', 2),
 (3, 'flaticon-user-1', '/patients', 'patients', 3),
 (4, 'flaticon-user', '/doctors', 'doctors', 4),
-(7, 'flaticon-user-1', '/users', 'users', 7);
+(7, 'flaticon-user-1', '/users', 'users', 7),
+(8, 'flaticon-calendar', '/doctors/availabledays', 'availabledays', 2),
+(9, 'flaticon-setting', '/medical-records', 'medical-records', 2);
 
 -- --------------------------------------------------------
 
@@ -69,9 +74,12 @@ INSERT INTO `menu_roles` (`role_id`, `menu_id`) VALUES
 (1, 5),
 (1, 6),
 (1, 7),
+(1, 9),
 (2, 1),
 (2, 2),
 (2, 3),
+(2, 8),
+(2, 9),
 (3, 1),
 (3, 2);
 
@@ -131,9 +139,7 @@ CREATE TABLE `usercredential` (
 
 INSERT INTO `usercredential` (`id`, `email`, `firstName`, `lastName`, `password`, `phone`, `resetToken`, `deleted`, `patientId`, `doctorId`) VALUES
 (1, 'janajonita@gmail.com', 'Hanane', 'Lahssini', '$2a$10$PNKFbdJrLFPfTFTj.BR8kugOdfabhTssKpBR/SBWv2aMlLnxAnO6q', '0623569674', NULL, 0, NULL, NULL),
-(2, 'system@clinic.com', 'System', 'Internal', '$2a$10$AbcdEFGHijklMNOPqrstuvHASHEDPWD', '0000000000', NULL, 1, NULL, NULL),
-(3, 'janat@gmail.com', 'janat', 'lahssini', '$2a$10$.tO3hYTc.9OXxCvmlOmINeYxIZyQ.424CkbBjJqXIm9aM0Tr2nyhe', '0612459641', NULL, 0, NULL, 1),
-(4, 'mohammed@gmail.com', 'mohammed', 'kbiri', '$2a$10$2j7XYv06RK.zoVY.H0a3rOnHh2couwBqLqW5Zg/kTyALYD57R.AK2', '0612457896', NULL, 0, 1, NULL);
+(2, 'system@clinic.com', 'System', 'Internal', '$2a$10$AbcdEFGHijklMNOPqrstuvHASHEDPWD', '0000000000', NULL, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -153,7 +159,9 @@ CREATE TABLE `user_roles` (
 INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES
 (1, 1),
 (4, 2),
-(4, 3);
+(4, 3),
+(5, 2),
+(6, 2);
 
 --
 -- Index pour les tables déchargées
@@ -206,7 +214,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT pour la table `menuitem`
 --
 ALTER TABLE `menuitem`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT pour la table `role`
@@ -218,7 +226,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT pour la table `usercredential`
 --
 ALTER TABLE `usercredential`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
